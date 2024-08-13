@@ -4,6 +4,12 @@
 # Windowsland
 A dynamic island adaptation for windows for absolutely no reason than aesthetic look.
 
+## Coming Soon
+1. Customization panel (Idle color, charging color, font)
+2. More Animations
+3. Visual Updates
+4. Quick Screenshot
+
 ## Usage Instructions
 Extract the file anywhere on your system, run the ***"WindowslandOverlay.exe"*** and toggle the ***Windowsland*** from the system tray.
 
