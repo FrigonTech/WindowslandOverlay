@@ -14,6 +14,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Data;
+using System.Configuration;
+using System.Runtime.CompilerServices;
 
 namespace DynamicIslandOverlay
 {
@@ -148,15 +150,14 @@ namespace DynamicIslandOverlay
 
             var toggleGameModeMenuItem = new MenuItem
             {
-                Header = "Game Mode",
+                Header = "On/Off",
                 IsCheckable = true,
-                IsChecked = IsGameMode
+                IsChecked = IsIslandHidden
             };
 
             toggleGameModeMenuItem.Click += (s, e) =>
             {
-                IsGameMode = !IsGameMode;
-                toggleGameModeMenuItem.IsChecked = IsGameMode;
+                toggleGameModeMenuItem.IsChecked = IsIslandHidden;
                 // Optionally update UI or other states based on the new game mode value
                 UpdateGameMode();
             };
@@ -179,7 +180,7 @@ namespace DynamicIslandOverlay
 
         private void UpdateGameMode()
         {
-            IsGameMode = !IsGameMode;
+            HideIsland();
         }
 
         private void OnWindowStateChanged(object sender, EventArgs e)
@@ -254,42 +255,6 @@ namespace DynamicIslandOverlay
 
         bool TriggerButtonOnScreen = false;
 
-        private void HoverTrigger_MouseEnter(Object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (!IsGameMode && TriggerButtonOnScreen == false)
-            {
-                pathanimation.From = 0;
-                pathanimation.To = 16;
-                BulgePath.BeginAnimation(Path.HeightProperty, pathanimation);
-                Arrow.BeginAnimation(System.Windows.Controls.Image.HeightProperty, pathanimation);
-                pulldownbutton.BeginAnimation(System.Windows.Controls.Button.HeightProperty, pathanimation);
-                TriggerButtonOnScreen = true;
-            }
-        }
-
-        private void HoverTrigger_MouseLeave(Object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (!IsGameMode && TriggerButtonOnScreen == true)
-            {
-                pathanimation.From = 16;
-                pathanimation.To = 0;
-                BulgePath.BeginAnimation(Path.HeightProperty, pathanimation);
-                Arrow.BeginAnimation(System.Windows.Controls.Image.HeightProperty, pathanimation);
-                pulldownbutton.BeginAnimation(System.Windows.Controls.Button.HeightProperty, pathanimation);
-                TriggerButtonOnScreen = false;
-            }
-        }
-
-        private void safeAreaEnter(Object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            safearea = true;
-        }
-
-        private void safeAreaLeave(Object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            safearea = false;
-        }
-
         private void BatteryChargingAnimation()
         {
             bool isCharging = IsBatteryCharging(); // Store the result of IsBatteryCharging()
@@ -321,51 +286,35 @@ namespace DynamicIslandOverlay
         {
             if (!IsIslandHidden)
             {
+                // Play the hide animation
                 DoubleAnimation widthAnimation = CreateAnimation(270, 0, TimeSpan.FromSeconds(0.3));
                 Island.BeginAnimation(WidthProperty, widthAnimation);
 
                 DoubleAnimation leftAnimation = CreateAnimation(30, 152, TimeSpan.FromSeconds(0.3));
                 Island.BeginAnimation(Canvas.LeftProperty, leftAnimation);
 
-                DoubleAnimation OpacityAnimation = CreateAnimation(1, 0, TimeSpan.FromSeconds(0.3));
-                Island.BeginAnimation(UIElement.OpacityProperty, OpacityAnimation);
+                DoubleAnimation opacityAnimation = CreateAnimation(1, 0, TimeSpan.FromSeconds(0.3));
+                Island.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
 
                 IsIslandHidden = true;
-
-                pathanimation.From = 16;
-                pathanimation.To = 0;
-                BulgePath.BeginAnimation(Path.HeightProperty, pathanimation);
-                Arrow.BeginAnimation(System.Windows.Controls.Image.HeightProperty, pathanimation);
-                pulldownbutton.BeginAnimation(System.Windows.Controls.Button.HeightProperty, pathanimation);
-                TriggerButtonOnScreen = false;
             }
             else
             {
+                // Play the show animation
                 DoubleAnimation widthAnimation = CreateAnimation(0, 270, TimeSpan.FromSeconds(0.3));
                 Island.BeginAnimation(WidthProperty, widthAnimation);
 
                 DoubleAnimation leftAnimation = CreateAnimation(152, 30, TimeSpan.FromSeconds(0.3));
                 Island.BeginAnimation(Canvas.LeftProperty, leftAnimation);
 
-                DoubleAnimation OpacityAnimation = CreateAnimation(0, 1, TimeSpan.FromSeconds(0.3));
-                Island.BeginAnimation(UIElement.OpacityProperty, OpacityAnimation);
+                DoubleAnimation opacityAnimation = CreateAnimation(0, 1, TimeSpan.FromSeconds(0.3));
+                Island.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
 
                 IsIslandHidden = false;
 
-                pathanimation.From = 16;
-                pathanimation.To = 0;
-                BulgePath.BeginAnimation(Path.HeightProperty, pathanimation);
-                Arrow.BeginAnimation(System.Windows.Controls.Image.HeightProperty, pathanimation);
-                pulldownbutton.BeginAnimation(System.Windows.Controls.Button.HeightProperty, pathanimation);
-                TriggerButtonOnScreen = false;
-
+                // Initialize island elements only when showing the island
                 InitializeIslandElements();
             }
-        }
-
-        private void PullDownButton_Click(object sender, RoutedEventArgs e)
-        {
-            HideIsland();
         }
     }
 }

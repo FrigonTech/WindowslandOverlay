@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" Width="800"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="Transparent"
+        Background="{x:Null}"
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="False">
@@ -63,13 +63,5 @@
                 </Grid>
             </Border>
         </Canvas>
-        <!-- Hover Trigger Rectangle -->
-        <Border BorderBrush="Black" BorderThickness="0" MouseEnter="HoverTrigger_MouseEnter" MouseLeave="HoverTrigger_MouseLeave">
-            <Grid>
-                <Button x:Name="pulldownbutton" MouseEnter="safeAreaEnter" MouseLeave="safeAreaLeave" Opacity="0.01" Panel.ZIndex="3" Click="PullDownButton_Click" IsHitTestVisible="True" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Width="15" Height="16" Margin="152,0,0,0"/>
-                <Rectangle x:Name="HoverTrigger" Fill="Cyan" Stroke="Cyan" StrokeThickness="5" Width="Auto" Height="Auto" Margin="3,0,-5,-2" Opacity="0.01" 
-                IsHitTestVisible="True" Panel.ZIndex="2"/>
-            </Grid>
-        </Border>
     </Grid>
 </Window>
