@@ -13,3 +13,8 @@ Extract the file anywhere on your system, run the ***"WindowslandOverlay.exe"***
 3. CPU usage monitor.
 4. Animates when device gets plugged in or plugged out.
 5. Startup when the device boots (Toggleable).
+
+## Images
+![11](https://github.com/user-attachments/assets/c1ddf73f-ea6c-4caa-9994-4dd83b754f7f)
+
+![1](https://github.com/user-attachments/assets/dfe172c1-abe4-4c4a-84d7-99d24fd3f322)
