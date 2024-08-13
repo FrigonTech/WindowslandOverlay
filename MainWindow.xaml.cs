@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using OpenHardwareMonitor.Hardware;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -16,6 +17,8 @@ using System.Windows.Threading;
 using System.Data;
 using System.Configuration;
 using System.Runtime.CompilerServices;
+using IWshRuntimeLibrary;
+using System.IO;
 
 namespace DynamicIslandOverlay
 {
@@ -24,6 +27,8 @@ namespace DynamicIslandOverlay
         
         private TaskbarIcon _trayIcon;
         private DispatcherTimer _timer;
+
+        private const string AppName = "DynamicIslandOverlay";
 
         // IsLaptop
         public bool IsLaptop()
@@ -40,20 +45,59 @@ namespace DynamicIslandOverlay
             }
         }
 
-        public class CpuInfo
+        public static float GetAverageCpuUsage()
         {
-            public static float GetCpuUsage()
+            float totalCpuUsage = 0;
+            int processorCount = 0;
+
+            try
             {
-                float cpuUsage = 0;
-                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PerfFormattedData_PerfOS_Processor"))
+                // Query the WMI for processor load percentages
+                var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+                foreach (ManagementObject obj in searcher.Get())
                 {
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        cpuUsage += float.Parse(obj["PercentProcessorTime"].ToString());
-                    }
+                    // Increment the processor count and add to the total CPU usage
+                    processorCount++;
+                    totalCpuUsage += float.Parse(obj["LoadPercentage"].ToString());
                 }
-                return cpuUsage;
+
+                // Calculate the mean CPU usage
+                if (processorCount > 0)
+                {
+                    return totalCpuUsage / processorCount;
+                }
+                else
+                {
+                    // Handle the case where no processors were found
+                    return 0;
+                }
             }
+            catch (Exception ex)
+            {
+                // Handle exceptions as needed
+                Console.WriteLine("Error: " + ex.Message);
+                return 0;
+            }
+        }
+
+        private void StartMonitoring()
+        {
+            if (_timer == null)
+            {
+                // Initialize the DispatcherTimer
+                _timer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(1) // Update every second
+                };
+                _timer.Tick += UpdateStats; // Update stats every tick
+            }
+
+            _timer.Start();
+        }
+
+        private void StopMonitoring()
+        {
+            _timer?.Stop(); // Stop the timer if it's running
         }
 
         public MainWindow()
@@ -66,15 +110,9 @@ namespace DynamicIslandOverlay
             this.Island.BorderBrush = new SolidColorBrush(IslandColor);
             SystemEvents.PowerModeChanged += OnPowerModeChanged;
             BatteryChargingAnimation();
-            HideIsland();
 
-            // Initialize the DispatcherTimer
-            _timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(1) // Update every 10 seconds
-            };
-            _timer.Tick += UpdateStats; // Update stats every tick
-            _timer.Start();
+            // Start by hiding the island, which will also handle the initial state of the monitoring
+            HideIsland();
 
             // Initial call to set the time, date, and stats immediately
             UpdateStats(null, null);
@@ -162,6 +200,24 @@ namespace DynamicIslandOverlay
                 UpdateGameMode();
             };
 
+            var toggleStartupMenuItem = new MenuItem
+            {
+                Header = "Enable/Disable Startup",
+                IsCheckable = true,
+                IsChecked = IsAppSetToRunAtStartup()
+            };
+            toggleStartupMenuItem.Click += (s, e) =>
+            {
+                if (toggleStartupMenuItem.IsChecked)
+                {
+                    SetAppToRunAtStartup(true);
+                }
+                else
+                {
+                    SetAppToRunAtStartup(false);
+                }
+            };
+
             var quitMenuItem = new MenuItem
             {
                 Header = "Quit"
@@ -173,9 +229,58 @@ namespace DynamicIslandOverlay
             };
 
             contextMenu.Items.Add(toggleGameModeMenuItem);
+            contextMenu.Items.Add(toggleStartupMenuItem);
             contextMenu.Items.Add(quitMenuItem);
+            
 
             return contextMenu;
+        }
+
+        private void SetAppToRunAtStartup(bool enable)
+        {
+            if (enable)
+            {
+                AddToStartup();
+            }
+            else
+            {
+                RemoveFromStartup();
+            }
+        }
+
+        private void AddToStartup()
+        {
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName; // Correct path to the executable
+            string shortcutPath = System.IO.Path.Combine(startupFolder, $"{AppName}.lnk");
+            CreateShortcut(shortcutPath, exePath);
+        }
+
+        private void RemoveFromStartup()
+        {
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string shortcutPath = System.IO.Path.Combine(startupFolder, $"{AppName}.lnk");
+            if (System.IO.File.Exists(shortcutPath))
+            {
+                System.IO.File.Delete(shortcutPath);
+            }
+        }
+
+        private void CreateShortcut(string shortcutPath, string targetPath)
+        {
+            WshShell shell = new WshShell();
+            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+            shortcut.TargetPath = targetPath;
+            shortcut.WorkingDirectory = System.IO.Path.GetDirectoryName(targetPath);
+            shortcut.IconLocation = targetPath; // Optional: Set the icon
+            shortcut.Save();
+        }
+
+        private bool IsAppSetToRunAtStartup()
+        {
+            string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string shortcutPath = System.IO.Path.Combine(startupFolder, $"{AppName}.lnk");
+            return System.IO.File.Exists(shortcutPath);
         }
 
         private void UpdateGameMode()
@@ -206,8 +311,8 @@ namespace DynamicIslandOverlay
                     .Replace("July", "Jul").Replace("August", "Aug").Replace("September", "Sep")
                     .Replace("October", "Oct").Replace("November", "Nov").Replace("December", "Dec");
 
-                float cpuUsage = CpuInfo.GetCpuUsage();
-                this.WindowslandText.Text = "CPU: " + cpuUsage.ToString() + "%";
+                float cpuUsage = GetAverageCpuUsage();
+                this.WindowslandText.Text = "CPU: " + Math.Floor(cpuUsage).ToString() + "%";
             }
             catch (Exception ex)
             {
@@ -296,6 +401,9 @@ namespace DynamicIslandOverlay
                 DoubleAnimation opacityAnimation = CreateAnimation(1, 0, TimeSpan.FromSeconds(0.3));
                 Island.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
 
+                // Stop monitoring when hiding the island
+                StopMonitoring();
+
                 IsIslandHidden = true;
             }
             else
@@ -310,10 +418,13 @@ namespace DynamicIslandOverlay
                 DoubleAnimation opacityAnimation = CreateAnimation(0, 1, TimeSpan.FromSeconds(0.3));
                 Island.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
 
-                IsIslandHidden = false;
-
                 // Initialize island elements only when showing the island
                 InitializeIslandElements();
+
+                // Start monitoring when showing the island
+                StartMonitoring();
+
+                IsIslandHidden = false;
             }
         }
     }
