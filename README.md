@@ -4,12 +4,6 @@
 # Windowsland
 A dynamic island adaptation for windows for absolutely no reason than aesthetic look.
 
-## Coming Soon
-1. Customization panel (Idle color, charging color, font)
-2. More Animations
-3. Visual Updates
-4. Quick Screenshot
-
 ## Usage Instructions
 Extract the file anywhere on your system, run the ***"WindowslandOverlay.exe"*** and toggle the ***Windowsland*** from the system tray.
 
@@ -19,6 +13,12 @@ Extract the file anywhere on your system, run the ***"WindowslandOverlay.exe"***
 3. CPU usage monitor.
 4. Animates when device gets plugged in or plugged out.
 5. Startup when the device boots (Toggleable).
+
+## Coming Soon
+1. Customization panel (Idle color, charging color, font)
+2. More Animations
+3. Visual Updates
+4. Quick Screenshot
 
 ## Images
 ![11](https://github.com/user-attachments/assets/c1ddf73f-ea6c-4caa-9994-4dd83b754f7f)
