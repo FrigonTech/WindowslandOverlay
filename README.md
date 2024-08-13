@@ -9,6 +9,7 @@ Extract the file anywhere on your system, run the ***"WindowslandOverlay.exe"***
 
 ## Features
 1. Shows day, date and month.
-2. Toggleable widget
-3. CPU usage monitor
-4. Animates when device gets plugged in or plugged out
+2. Topmost Widget (Toggleable).
+3. CPU usage monitor.
+4. Animates when device gets plugged in or plugged out.
+5. Startup when the device boots (Toggleable).
