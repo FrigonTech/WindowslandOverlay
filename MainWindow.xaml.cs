@@ -128,9 +128,10 @@ namespace DynamicIslandOverlay
 
         private void InitializeTrayIcon()
         {
+
             _trayIcon = new TaskbarIcon
             {
-                Icon = new System.Drawing.Icon("Assets/iconong.ico"), // Update with the correct relative path
+                Icon = new System.Drawing.Icon("Assets/WLicon.ico"), // Relative path to the output directory
                 ToolTipText = "Dynamic Island Overlay",
                 ContextMenu = CreateContextMenu()
             };
