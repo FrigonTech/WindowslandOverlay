@@ -7,14 +7,14 @@ A dynamic island adaptation for windows for absolutely no reason than aesthetic 
 ## Usage Instructions
 Extract the file anywhere on your system, run the ***"WindowslandOverlay.exe"*** and toggle the ***Windowsland*** from the system tray.
 
-## Features
+## Current Features
 1. Shows day, date and month.
 2. Topmost Widget (Toggleable).
 3. CPU usage monitor.
 4. Animates when device gets plugged in or plugged out.
 5. Startup when the device boots (Toggleable).
 
-## Coming Soon
+## Features Expected Soon
 1. Customization panel (Idle color, charging color, font)
 2. More Animations
 3. Visual Updates
