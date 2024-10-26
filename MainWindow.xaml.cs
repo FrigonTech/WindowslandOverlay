@@ -45,6 +45,20 @@ namespace DynamicIslandOverlay
             }
         }
 
+        private double angle = 0; // Initial angle
+
+        private void OnRendering(object sender, EventArgs e)
+        {
+            // Increase angle based on time for smoother animation
+            angle += 2; // Adjust this value for speed (degrees per frame)
+            if (angle >= 360)
+                angle = 0; // Reset angle to avoid overflow
+
+            // Apply the new angle
+            RotatingTransform.Angle = angle;
+            RotatingTransform1.Angle = (angle)*-1;
+        }
+
         public static float GetAverageCpuUsage()
         {
             float totalCpuUsage = 0;
@@ -110,6 +124,7 @@ namespace DynamicIslandOverlay
             this.Island.BorderBrush = new SolidColorBrush(IslandColor);
             SystemEvents.PowerModeChanged += OnPowerModeChanged;
             BatteryChargingAnimation();
+            CompositionTarget.Rendering += OnRendering;
 
             // Start by hiding the island, which will also handle the initial state of the monitoring
             HideIsland();

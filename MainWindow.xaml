@@ -60,6 +60,23 @@
                                    VerticalAlignment="Center" Height="14" Width="85" Foreground="White" FontFamily="Arial Rounded MT Bold" TextAlignment="Center" FontSize="10" Opacity="0"/>
                     </Grid>
                     <TextBlock x:Name="WindowslandText" Foreground="White" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Center" TextWrapping="Wrap" Text="CPU: 28%" Height="23" Width="73" TextAlignment="Center" FontFamily="Arial Rounded MT Bold" LineHeight="1"/>
+                    <Image ClipToBounds="True" Grid.Column="1" Source="/Assets/settings.png" Stretch="Uniform" Height="36" RenderTransformOrigin="0.5,0.5" Width="36">
+                        <Image.RenderTransform>
+                            <RotateTransform x:Name="RotatingTransform1" Angle="0"/>
+                            <!-- Set initial angle to 0 -->
+                        </Image.RenderTransform>
+                    </Image>
+                    <Image Grid.Column="1" 
+               Source="/Assets/settings.png" 
+               Stretch="Fill" 
+               RenderTransformOrigin="0.5,0.5" 
+               Width="14" 
+               Height="14">
+                        <Image.RenderTransform>
+                            <RotateTransform x:Name="RotatingTransform" Angle="0"/>
+                            <!-- Set initial angle to 0 -->
+                        </Image.RenderTransform>
+                    </Image>
                 </Grid>
             </Border>
         </Canvas>
